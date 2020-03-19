@@ -1,0 +1,230 @@
+```html
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='keywords' content='关键字描述网站内容'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>缓动动画</title>
+    <link rel='stylesheet' href=''>
+    <style>
+        body {
+            height: 3000px;
+            width: 100%;
+        }
+
+        .con {
+            position: relative;
+            top: 0px;
+            width: 100%;
+            height: 300px;
+            background-color: powderblue;
+        }
+
+        .header {
+            position: relative;
+            top: 0;
+            height: 300px;
+            background-color: red;
+            z-index: 20;
+        }
+
+        .main {
+            margin-top: 500px;
+            height: 300px;
+            background-color: orange;
+        }
+
+        .footer {
+            margin-top: 300px;
+            height: 600px;
+            background-color: orchid;
+            position: relative;
+        }
+
+        .top,
+        .bottom {
+            width: 80px;
+            height: 36px;
+            background-color: palegreen;
+            border-radius: 4px;
+            transition: all .3s linear;
+            text-align: center;
+            line-height: 36px;
+            position: absolute;
+            right: 50px;
+            bottom: 50px;
+        }
+
+        .top:hover,
+        .bottom:hover {
+            background-color: palevioletred;
+        }
+
+        .open {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, 0%);
+            width: 120px;
+            height: 48px;
+            background-color: seagreen;
+            text-align: center;
+            line-height: 48px;
+            font-size: 18px;
+            color: #ffffff;
+            transition: all .3s linear;
+        }
+
+        .open:hover {
+            background: springgreen;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="con">
+    </div>
+    <div class="header">
+        <div class="open">
+            打开
+        </div>
+
+        <div class="bottom">
+            回到底部
+        </div>
+    </div>
+    <div class='main'></div>
+    <div class="footer">
+        <div class="top">
+            回到顶部
+        </div>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <script>
+        // 打开
+        var openEl = document.querySelector('.open')
+        // 内容
+        var conEl = document.querySelector('.con')
+        // 背景
+        var headerEl = document.querySelector('.header')
+        var flag = false
+        openEl.onclick = function () {
+            if (flag) {
+                // conEl.style.top = "300px" 
+                slow(conEl, {
+                    height: 300,
+                    // opacity:.3,
+                    // zIndex:3
+                })
+                flag = false
+            } else {
+                // conEl.style.top = "0px" 
+                slow(conEl, {
+                    // width:500,
+                    height: 0,
+                    // opacity:.3,
+                    // zIndex:3
+                })
+                flag = true
+            }
+        }
+        function slow(ele, target) {
+            clearInterval(ele.timer);
+            ele.timer = setInterval(function () {
+                var flag = true;
+                var start, end;
+                for (var i in target) {
+                    if (i === 'zIndex') {
+                        ele.style.zIndex = target[i];
+                        continue;
+                    } else if (i === 'opacity') {
+                        start = parseInt(getStyle(ele, i) * 100);
+                        end = target[i] * 100;
+                    } else {
+                        start = parseInt(getStyle(ele, i));
+                        end = target[i];
+                    }
+                    var step = (end - start) / 10;
+                    if (Math.abs(step) < 1) {
+                        step = step > 0 ? 1 : Math.floor(step);
+                    }
+                    if (i === 'opacity') {
+                        ele.style[i] = (start + step) / 100;
+                    } else {
+                        ele.style[i] = start + step + 'px';
+                    }
+                    if (start + step !== end) {
+                        flag = false;
+                    }
+                }
+                if (flag) {
+                    console.log('stop ...');
+                    clearInterval(ele.timer);
+                }
+            }, 17)
+        }
+
+        function getStyle(ele, styleName) {
+            if (ele.currentStyle) {
+                return ele.currentStyle[styleName];
+            } else {
+                return window.getComputedStyle(ele, null)[styleName];
+            }
+        }
+        //          $(window).scroll(function(){
+        //             var disTop = $(window).scrollTop();
+        //             if(disTop > 250){
+        //                 $(".top").fadeIn(600);
+        //             }else{
+        //                 $(".top").fadeOut(600);
+        //             }
+        //         });
+        //         $(function(){
+        //             $(".top").click(function(){
+        //                 $("html,body").animate({
+        //                     scrollTop: 0
+        //                 },1500);
+        //             })
+        // 　　　　 　　 $(".bottom").click(function(){
+        //                 $("html,body").animate({
+        //                     // scrollTop: document.body.clientHeight
+        //                     scrollTop:1000
+        //                 },1500);
+        //             })
+        //         });
+        // 获取点击的元素
+        getTop('top', 1500, 100)
+        function getTop(num, timer, height) {
+            $("." + num).click(function () {
+                // 获取当前元素的高度
+                console.log($(document.documentElement).scrollTop())
+                // 获取当前的页面的位置 然后执行动画会到某个位置 需要多少秒
+                $(document.documentElement).animate({
+                    scrollTop: height || 0
+                }, timer)
+            })
+        }
+        getBottom('bottom', 1500, 2000)
+        function getBottom(num, timer, height) {
+            $("." + num).click(function () {
+                // 获取当前元素的高度
+                // 获取当前的页面的位置 然后执行动画会到某个位置 需要多少秒
+                $(document.documentElement).animate({
+                    scrollTop: height || 2000
+                }, timer)
+            })
+        }
+
+    //     $('.btn').click(function(){
+    //     // console.log($(document.documentElement).scrollTop());
+    //     // 
+    //     $(document.documentElement).animate({
+    //         scrollTop:0
+    //     },2000)
+    // })
+    </script>
+</body>
+
+</html>
+```
